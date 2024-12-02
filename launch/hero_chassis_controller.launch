@@ -1,0 +1,20 @@
+<launch>
+    <!-- 启动相关的启动文件 -->
+    <include file="$(find rm_description)/launch/hero.launch">
+        <arg name="load_chassis" value="true"/>
+        <arg name="roller_type" value="realistic"/>
+        <arg name="paused" value="true"/>
+    </include>
+
+    <!-- 加载控制器配置文件 -->
+    <rosparam file="$(find hero_chassis_controller)/config/hero_chassis_controller.yaml" command="load"/>
+    <rosparam file="$(find hero_chassis_controller)/config/controllers.yaml" command="load"/>
+
+    <!-- 启动控制器加载节点 -->
+    <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
+          output="screen" args="
+          hero_chassis_controller
+          joint_state_controller
+          "/>
+
+</launch>

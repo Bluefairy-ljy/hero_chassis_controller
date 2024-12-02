@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<library path="lib/libhero_chassis_controller_plugin">
+    <class name="hero_chassis_controller/HeroWheelController"
+           type="hero_chassis_controller::HeroWheelController"
+           base_class_type="controller_interface::ControllerBase">
+        <description>controller for hero robot chassis</description>
+    </class>
+</library>

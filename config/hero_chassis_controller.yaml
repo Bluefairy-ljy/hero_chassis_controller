@@ -1,0 +1,18 @@
+hero_chassis_controller:
+  pid:
+    left_front_wheel:
+      p: 0.5
+      i: 0.1
+      d: 0.05
+    right_front_wheel:
+      p: 0.5
+      i: 0.1
+      d: 0.05
+    left_back_wheel:
+      p: 0.5
+      i: 0.1
+      d: 0.05
+    right_back_wheel:
+      p: 0.5
+      i: 0.1
+      d: 0.05

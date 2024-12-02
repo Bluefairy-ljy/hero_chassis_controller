@@ -1,0 +1,16 @@
+controller_manager:
+  ros__parameters:
+    update_rate: 50
+
+joint_state_controller:
+  type: joint_state_controller/JointStateController
+  publish_rate: 50
+
+hero_chassis_controller:
+  type: hero_chassis_controller/HeroWheelController
+  publish_rate: 50
+  joint_names:
+    - left_front_wheel_joint
+    - right_front_wheel_joint
+    - left_back_wheel_joint
+    - right_back_wheel_joint
