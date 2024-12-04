@@ -15,6 +15,7 @@ find_package(catkin REQUIRED COMPONENTS
         pluginlib
         gazebo_msgs
 )
+find_package(yaml-cpp REQUIRED)
 
 # 定义catkin包的属性
 catkin_package(
@@ -48,6 +49,7 @@ add_library(hero_chassis_controller_plugin
 target_link_libraries(hero_chassis_controller_plugin
         hero_chassis_helper_library
         ${catkin_LIBRARIES}
+        yaml-cpp
 )
 
 # 安装插件描述文件

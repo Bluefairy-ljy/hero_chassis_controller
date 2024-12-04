@@ -1,4 +1,10 @@
 hero_chassis_controller:
+  #底盘参数部分
+  chassis:
+    wheelbase: 0.4
+    trackwidth: 0.4
+    wheel_radius: 0.07625
+  #pid参数部分
   pid:
     left_front_wheel:
       p: 0.5

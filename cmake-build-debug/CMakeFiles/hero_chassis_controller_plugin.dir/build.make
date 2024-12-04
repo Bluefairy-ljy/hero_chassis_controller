@@ -128,6 +128,7 @@ hero_chassis_controller_plugin_EXTERNAL_OBJECTS =
 /home/ljyi/Final_ws/src/hero_chassis_controller/devel/lib/libhero_chassis_controller_plugin.so: /usr/lib/x86_64-linux-gnu/libboost_system.so.1.71.0
 /home/ljyi/Final_ws/src/hero_chassis_controller/devel/lib/libhero_chassis_controller_plugin.so: /usr/lib/x86_64-linux-gnu/libboost_thread.so.1.71.0
 /home/ljyi/Final_ws/src/hero_chassis_controller/devel/lib/libhero_chassis_controller_plugin.so: /usr/lib/x86_64-linux-gnu/libconsole_bridge.so.0.4
+/home/ljyi/Final_ws/src/hero_chassis_controller/devel/lib/libhero_chassis_controller_plugin.so: /usr/lib/x86_64-linux-gnu/libyaml-cpp.so.0.6.2
 /home/ljyi/Final_ws/src/hero_chassis_controller/devel/lib/libhero_chassis_controller_plugin.so: CMakeFiles/hero_chassis_controller_plugin.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/ljyi/Final_ws/src/hero_chassis_controller/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX shared library /home/ljyi/Final_ws/src/hero_chassis_controller/devel/lib/libhero_chassis_controller_plugin.so"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/hero_chassis_controller_plugin.dir/link.txt --verbose=$(VERBOSE)

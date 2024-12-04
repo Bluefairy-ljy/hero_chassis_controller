@@ -8,6 +8,8 @@
 #include <hardware_interface/joint_command_interface.h>
 #include <ros/ros.h>
 #include <vector>
+#include <rosbag/bag.h>
+#include <hero_chassis_controller/kinematics_helper.h>
 namespace hero_chassis_controller {
 class HeroWheelController : public controller_interface::Controller<hardware_interface::EffortJointInterface> {
 public:
@@ -27,10 +29,10 @@ private:
   std::vector<double> current_speeds;
   std::vector<hardware_interface::JointHandle> joints;
   ros::Subscriber speed_subscriber;
-  ros::Publisher control_publisher;
-  ros::Subscriber target_speed_subscriber;
+  kinematics_helper::ChassisParams chassis_params;
+  ros::Subscriber cmd_vel_subscriber;
   void speedCallback(const geometry_msgs::Twist::ConstPtr &msg);
-  void targetSpeedsCallback(const geometry_msgs::Twist::ConstPtr &msg);
+  void cmdVelCallback(const geometry_msgs::Twist::ConstPtr &msg);
 };
 
 // 使用PLUGINLIB_EXPORT_CLASS宏注册插件，指定继承自controller_interface::ControllerBase
