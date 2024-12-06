@@ -28,6 +28,8 @@ private:
   std::vector<double> target_speeds;
   std::vector<double> current_speeds;
   std::vector<hardware_interface::JointHandle> joints;
+  geometry_msgs::Twist chassis_vel;
+  std::vector<double> wheel_angular_vels;
   ros::Subscriber speed_subscriber;
   kinematics_helper::ChassisParams chassis_params;
   ros::Subscriber cmd_vel_subscriber;
@@ -35,7 +37,7 @@ private:
   void cmdVelCallback(const geometry_msgs::Twist::ConstPtr &msg);
 };
 
-// 使用PLUGINLIB_EXPORT_CLASS宏注册插件，指定继承自controller_interface::ControllerBase
+// 注册插件
 PLUGINLIB_EXPORT_CLASS(hero_chassis_controller::HeroWheelController, controller_interface::ControllerBase)
 }
 #endif
