@@ -8,7 +8,7 @@
 #include <eigen3/Eigen/Dense>
 
 namespace kinematics_helper {
-// 结构体
+//结构体
 struct ChassisParams {
   double wheelbase;
   double trackwidth;

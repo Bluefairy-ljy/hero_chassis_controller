@@ -2,7 +2,7 @@
 
 namespace hero_chassis_controller {
 
-// 构造函数
+//构造函数
 HeroWheelController::HeroWheelController() {
     pid_controllers.resize(4);
     target_speeds.resize(4, 0);
@@ -10,9 +10,9 @@ HeroWheelController::HeroWheelController() {
     joints.resize(4);
 }
 
-// init函数
+//init函数
 bool HeroWheelController::init(hardware_interface::EffortJointInterface *effort_joint_interface, ros::NodeHandle &controller_nh) {
-    // 获取四个轮子的关节句柄
+    //获取四个轮子的关节句柄
     joints[0] = effort_joint_interface->getHandle("left_front_wheel_joint");
     joints[1] = effort_joint_interface->getHandle("right_front_wheel_joint");
     joints[2] = effort_joint_interface->getHandle("left_back_wheel_joint");
@@ -38,9 +38,9 @@ bool HeroWheelController::init(hardware_interface::EffortJointInterface *effort_
             continue;
         }
 
-        double p_gain = config["hero_chassis_controller"]["pid"][ss.str()]["p"].as<double>();
-        double i_gain = config["hero_chassis_controller"]["pid"][ss.str()]["i"].as<double>();
-        double d_gain = config["hero_chassis_controller"]["pid"][ss.str()]["d"].as<double>();
+        auto p_gain = config["hero_chassis_controller"]["pid"][ss.str()]["p"].as<double>();
+        auto i_gain = config["hero_chassis_controller"]["pid"][ss.str()]["i"].as<double>();
+        auto d_gain = config["hero_chassis_controller"]["pid"][ss.str()]["d"].as<double>();
         pid_controllers[i].setGains(p_gain, i_gain, d_gain, std::numeric_limits<double>::max(), std::numeric_limits<double>::min(), false);
 
         if (initResults[i]) {
@@ -54,46 +54,56 @@ bool HeroWheelController::init(hardware_interface::EffortJointInterface *effort_
     chassis_params.trackwidth = config["hero_chassis_controller"]["chassis"]["trackwidth"].as<double>();
     chassis_params.wheel_radius = config["hero_chassis_controller"]["chassis"]["wheel_radius"].as<double>();
     ROS_INFO_STREAM("Loaded chassis params: wheelbase = " << chassis_params.wheelbase << ", trackwidth = " << chassis_params.trackwidth << ", wheel_radius = " << chassis_params.wheel_radius);
-
-    // 订阅 /cmd_vel 话题
+    //订阅/cmd_vel话题
     cmd_vel_subscriber = controller_nh.subscribe("/cmd_vel", 10, &HeroWheelController::cmdVelCallback, this);
-    if (allInitialized) {
-        speed_subscriber = controller_nh.subscribe("wheel_speed_feedback", 10, &HeroWheelController::speedCallback, this);
-    }
-
+    //订阅关节状态话题
+    joint_state_subscriber = controller_nh.subscribe("/joint_states", 10, &HeroWheelController::jointStateCallback, this);
     return allInitialized;
 }
 
-// update函数
+//update函数
 void HeroWheelController::update(const ros::Time &time, const ros::Duration &period) {
-    for (int i = 0; i < 4; ++i) {
-        double error = target_speeds[i] - current_speeds[i];
-        double control_output = pid_controllers[i].computeCommand(error, period);
-        joints[i].setCommand(control_output);
+    std::vector<double> current_wheel_speeds = getCurrentWheelSpeeds();
+    if (!current_wheel_speeds.empty()) {
+        current_speeds = current_wheel_speeds;
+        for (int i = 0; i < 4; ++i) {
+            double error = target_speeds[i] - current_speeds[i];
+            double control_output = pid_controllers[i].computeCommand(error, period);
+            joints[i].setCommand(control_output);
+        }
     }
 }
 
-// starting函数
+//starting函数
 void HeroWheelController::starting(const ros::Time &time) {
     for (int i = 0; i < 4; ++i) {
         pid_controllers[i].reset();
     }
 }
 
-// stopping函数
+//stopping函数
 void HeroWheelController::stopping(const ros::Time &time) {}
 
-// 速度回调函数（这里有问题哈）
-void HeroWheelController::speedCallback(const geometry_msgs::Twist::ConstPtr &msg) {
-    current_speeds[0] = msg->linear.x;
-    current_speeds[1] = msg->linear.x;
-    current_speeds[2] = msg->linear.x;
-    current_speeds[3] = msg->linear.x;
+//getCurrentWheelSpeeds的函数实现
+std::vector<double> HeroWheelController::getCurrentWheelSpeeds() const {
+    std::vector<double> current_speeds;
+    for (const auto & joint : joints) {
+        const std::string& joint_name = joint.getName();
+        if (!joint_states.name.empty()) {
+            for (size_t j = 0; j < joint_states.name.size(); ++j) {
+                if (joint_states.name[j] == joint_name) {
+                    current_speeds.push_back(joint_states.velocity[j]);
+                    break;
+                }
+            }
+        }
+    }
+    return current_speeds;
 }
 
-// 接收底盘速度指令话题的回调函数
+//接收底盘速度指令话题的回调函数
 void HeroWheelController::cmdVelCallback(const geometry_msgs::Twist::ConstPtr &msg) {
-    // 输出接收到的底盘速度指令
+    //输出接收到的底盘速度指令
     ROS_INFO_STREAM("Received cmd_vel: vx = " << msg->linear.x << ", vy = " << msg->linear.y << ", omega_z = " << msg->angular.z);
     std::vector<double> wheel_speeds;
     kinematics_helper::inverseKinematics(*msg, chassis_params, wheel_speeds);
@@ -103,6 +113,13 @@ void HeroWheelController::cmdVelCallback(const geometry_msgs::Twist::ConstPtr &m
     target_speeds[1] = wheel_speeds[1];
     target_speeds[2] = wheel_speeds[2];
     target_speeds[3] = wheel_speeds[3];
+}
+
+//关节状态消息回调函数
+void HeroWheelController::jointStateCallback(const sensor_msgs::JointState::ConstPtr &msg) {
+    if (msg) {
+        joint_states = *msg;
+    }
 }
 
 } // namespace hero_chassis_controller

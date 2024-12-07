@@ -10,6 +10,8 @@
 #include <vector>
 #include <rosbag/bag.h>
 #include <hero_chassis_controller/kinematics_helper.h>
+#include <sensor_msgs/JointState.h>
+
 namespace hero_chassis_controller {
 class HeroWheelController : public controller_interface::Controller<hardware_interface::EffortJointInterface> {
 public:
@@ -21,7 +23,8 @@ public:
   void starting(const ros::Time &time) override;
   void stopping(const ros::Time &time) override;
   void setWheelCommands(const std::vector<double> &commands);
-  const std::vector<control_toolbox::Pid>&getPidControls() const {return pid_controllers;};
+  const std::vector<control_toolbox::Pid>& getPidControls() const {return pid_controllers;};
+  std::vector<double> getCurrentWheelSpeeds() const;
 
 private:
   std::vector<control_toolbox::Pid> pid_controllers;
@@ -30,14 +33,15 @@ private:
   std::vector<hardware_interface::JointHandle> joints;
   geometry_msgs::Twist chassis_vel;
   std::vector<double> wheel_angular_vels;
-  ros::Subscriber speed_subscriber;
-  kinematics_helper::ChassisParams chassis_params;
+  ros::Subscriber joint_state_subscriber;
+  sensor_msgs::JointState joint_states;
+  kinematics_helper::ChassisParams chassis_params{};
   ros::Subscriber cmd_vel_subscriber;
-  void speedCallback(const geometry_msgs::Twist::ConstPtr &msg);
   void cmdVelCallback(const geometry_msgs::Twist::ConstPtr &msg);
+  void jointStateCallback(const sensor_msgs::JointState::ConstPtr &msg);
 };
 
-// 注册插件
+//注册插件
 PLUGINLIB_EXPORT_CLASS(hero_chassis_controller::HeroWheelController, controller_interface::ControllerBase)
 }
 #endif
