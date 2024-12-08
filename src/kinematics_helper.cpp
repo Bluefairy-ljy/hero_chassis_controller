@@ -67,9 +67,9 @@ void forwardKinematics(const std::vector<double>& wheel_speeds, const ChassisPar
     chassis_vel.linear.y = vy;
     chassis_vel.angular.z = omega_z;
 
-    ROS_INFO("Calculated vx: %f", vx);
-    ROS_INFO("Calculated vy: %f", vy);
-    ROS_INFO("Calculated omega_z: %f", omega_z);
+    // ROS_INFO("Calculated vx: %f", vx);
+    // ROS_INFO("Calculated vy: %f", vy);
+    // ROS_INFO("Calculated omega_z: %f", omega_z);
 }
 
 }  // namespace kinematics_helper

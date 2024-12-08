@@ -10,6 +10,7 @@
 #include <vector>
 #include <rosbag/bag.h>
 #include <hero_chassis_controller/kinematics_helper.h>
+#include <hero_chassis_controller/odometry_helper.h>
 #include <sensor_msgs/JointState.h>
 
 namespace hero_chassis_controller {
@@ -37,6 +38,7 @@ private:
   sensor_msgs::JointState joint_states;
   kinematics_helper::ChassisParams chassis_params{};
   ros::Subscriber cmd_vel_subscriber;
+  odometry_helper* odom_helper;
   void cmdVelCallback(const geometry_msgs::Twist::ConstPtr &msg);
   void jointStateCallback(const sensor_msgs::JointState::ConstPtr &msg);
 };

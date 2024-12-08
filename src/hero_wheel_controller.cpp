@@ -8,6 +8,7 @@ HeroWheelController::HeroWheelController() {
     target_speeds.resize(4, 0);
     current_speeds.resize(4);
     joints.resize(4);
+    odom_helper=nullptr;
 }
 
 //init函数
@@ -58,6 +59,9 @@ bool HeroWheelController::init(hardware_interface::EffortJointInterface *effort_
     cmd_vel_subscriber = controller_nh.subscribe("/cmd_vel", 10, &HeroWheelController::cmdVelCallback, this);
     //订阅关节状态话题
     joint_state_subscriber = controller_nh.subscribe("/joint_states", 10, &HeroWheelController::jointStateCallback, this);
+
+    odom_helper = new odometry_helper(chassis_params);
+
     return allInitialized;
 }
 
@@ -70,6 +74,9 @@ void HeroWheelController::update(const ros::Time &time, const ros::Duration &per
             double error = target_speeds[i] - current_speeds[i];
             double control_output = pid_controllers[i].computeCommand(error, period);
             joints[i].setCommand(control_output);
+        }
+        if (odom_helper) {
+            odom_helper->update_odometry(current_wheel_speeds, time);
         }
     }
 }
@@ -103,7 +110,6 @@ std::vector<double> HeroWheelController::getCurrentWheelSpeeds() const {
 
 //接收底盘速度指令话题的回调函数
 void HeroWheelController::cmdVelCallback(const geometry_msgs::Twist::ConstPtr &msg) {
-    //输出接收到的底盘速度指令
     ROS_INFO_STREAM("Received cmd_vel: vx = " << msg->linear.x << ", vy = " << msg->linear.y << ", omega_z = " << msg->angular.z);
     std::vector<double> wheel_speeds;
     kinematics_helper::inverseKinematics(*msg, chassis_params, wheel_speeds);
