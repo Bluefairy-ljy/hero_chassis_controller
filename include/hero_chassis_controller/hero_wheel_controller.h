@@ -11,6 +11,7 @@
 #include <rosbag/bag.h>
 #include <hero_chassis_controller/kinematics_helper.h>
 #include <hero_chassis_controller/odometry_helper.h>
+#include <hero_chassis_controller/tf_transform_helper.h>
 #include <sensor_msgs/JointState.h>
 
 namespace hero_chassis_controller {
@@ -41,6 +42,8 @@ private:
   odometry_helper* odom_helper;
   void cmdVelCallback(const geometry_msgs::Twist::ConstPtr &msg);
   void jointStateCallback(const sensor_msgs::JointState::ConstPtr &msg);
+  int speed_mode{};
+  tf_transform_helper::TFTransformHelper tf_helper;
 };
 
 //注册插件

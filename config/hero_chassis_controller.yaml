@@ -1,4 +1,7 @@
 hero_chassis_controller:
+  #速度模式参数
+  #0代表底盘坐标系速度模式，1代表全局坐标系速度模式
+  speed_mode: 1
   #底盘参数部分
   chassis:
     wheelbase: 0.4

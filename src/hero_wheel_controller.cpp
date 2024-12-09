@@ -25,6 +25,13 @@ bool HeroWheelController::init(hardware_interface::EffortJointInterface *effort_
 
     std::string config_file_path = ros::package::getPath("hero_chassis_controller") + "/config/hero_chassis_controller.yaml";
     YAML::Node config = YAML::LoadFile(config_file_path);
+    //读取速度模式配置，默认0
+    int speed_mode = 0;
+    if (config["hero_chassis_controller"]["speed_mode"]) {
+        speed_mode = config["hero_chassis_controller"]["speed_mode"].as<int>();
+    }
+    //将读取到的速度模式保存下来
+    this->speed_mode = speed_mode;
 
     for (int i = 0; i < 4; i++) {
         std::stringstream ss;
@@ -45,9 +52,9 @@ bool HeroWheelController::init(hardware_interface::EffortJointInterface *effort_
         pid_controllers[i].setGains(p_gain, i_gain, d_gain, std::numeric_limits<double>::max(), std::numeric_limits<double>::min(), false);
 
         if (initResults[i]) {
-            ROS_INFO_STREAM("Initialized PID controller for wheel " << i << " with p = " << p_gain << ", i = " << i_gain << ", d = " << d_gain);
+            ROS_INFO_STREAM("initialized pid for wheel " << i << " with p = " << p_gain << ", i = " << i_gain << ", d = " << d_gain);
         } else {
-            ROS_ERROR_STREAM("Failed to initialize PID controller for wheel " << i);
+            ROS_ERROR_STREAM("failed to initialize pid for wheel " << i);
         }
     }
 
@@ -57,11 +64,9 @@ bool HeroWheelController::init(hardware_interface::EffortJointInterface *effort_
     ROS_INFO_STREAM("Loaded chassis params: wheelbase = " << chassis_params.wheelbase << ", trackwidth = " << chassis_params.trackwidth << ", wheel_radius = " << chassis_params.wheel_radius);
     //订阅/cmd_vel话题
     cmd_vel_subscriber = controller_nh.subscribe("/cmd_vel", 10, &HeroWheelController::cmdVelCallback, this);
-    //订阅关节状态话题
+    //订阅/joint_states话题
     joint_state_subscriber = controller_nh.subscribe("/joint_states", 10, &HeroWheelController::jointStateCallback, this);
-
     odom_helper = new odometry_helper(chassis_params);
-
     return allInitialized;
 }
 
@@ -91,7 +96,7 @@ void HeroWheelController::starting(const ros::Time &time) {
 //stopping函数
 void HeroWheelController::stopping(const ros::Time &time) {}
 
-//getCurrentWheelSpeeds的函数实现
+//getCurrentWheelSpeeds的函数
 std::vector<double> HeroWheelController::getCurrentWheelSpeeds() const {
     std::vector<double> current_speeds;
     for (const auto & joint : joints) {
@@ -110,15 +115,34 @@ std::vector<double> HeroWheelController::getCurrentWheelSpeeds() const {
 
 //接收底盘速度指令话题的回调函数
 void HeroWheelController::cmdVelCallback(const geometry_msgs::Twist::ConstPtr &msg) {
-    ROS_INFO_STREAM("Received cmd_vel: vx = " << msg->linear.x << ", vy = " << msg->linear.y << ", omega_z = " << msg->angular.z);
-    std::vector<double> wheel_speeds;
-    kinematics_helper::inverseKinematics(*msg, chassis_params, wheel_speeds);
-    geometry_msgs::Twist chassis_vel;
-    kinematics_helper::forwardKinematics(wheel_speeds, chassis_params, chassis_vel);
-    target_speeds[0] = wheel_speeds[0];
-    target_speeds[1] = wheel_speeds[1];
-    target_speeds[2] = wheel_speeds[2];
-    target_speeds[3] = wheel_speeds[3];
+    if (this->speed_mode == 0) {
+        //底盘坐标系速度模式
+        std::vector<double> wheel_speeds;
+        kinematics_helper::inverseKinematics(*msg, chassis_params, wheel_speeds);
+        geometry_msgs::Twist chassis_vel;
+        kinematics_helper::forwardKinematics(wheel_speeds, chassis_params, chassis_vel);
+        target_speeds[0] = wheel_speeds[0];
+        target_speeds[1] = wheel_speeds[1];
+        target_speeds[2] = wheel_speeds[2];
+        target_speeds[3] = wheel_speeds[3];
+    } else if (this->speed_mode == 1) {
+        //全局坐标系速度模式
+        geometry_msgs::Twist cmd_vel_base_link;
+        ROS_INFO("try to transform");
+        if (tf_helper.transformCmdVelToBaseLink(*msg, cmd_vel_base_link)) {
+            //坐标变换成功，再进行逆运动学计算
+            std::vector<double> wheel_speeds;
+            kinematics_helper::inverseKinematics(cmd_vel_base_link, chassis_params, wheel_speeds);
+            geometry_msgs::Twist chassis_vel;
+            kinematics_helper::forwardKinematics(wheel_speeds, chassis_params, chassis_vel);
+            target_speeds[0] = wheel_speeds[0];
+            target_speeds[1] = wheel_speeds[1];
+            target_speeds[2] = wheel_speeds[2];
+            target_speeds[3] = wheel_speeds[3];
+        } else {
+            ROS_ERROR("fail to transform");
+        }
+    }
 }
 
 //关节状态消息回调函数

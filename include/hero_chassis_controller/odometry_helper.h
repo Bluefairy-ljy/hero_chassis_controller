@@ -18,6 +18,7 @@ private:
   ros::Time last_time;
   kinematics_helper::ChassisParams& chassis_params;
   tf::TransformBroadcaster odom_broadcaster;
+  tf::TransformBroadcaster broadcaster;
   geometry_msgs::TransformStamped odom_trans;
   nav_msgs::Odometry odom;
 
