@@ -69,6 +69,6 @@ This warning is for project developers.  Use -Wno-dev to suppress it.
 -- catkin 0.8.10
 -- BUILD_SHARED_LIBS is on
 -- Using these message generators: gencpp;geneus;genlisp;gennodejs;genpy
--- Configuring done (0.6s)
--- Generating done (0.0s)
+-- Configuring done (0.7s)
+-- Generating done (0.1s)
 -- Build files have been written to: /home/ljyi/Final_ws/src/hero_chassis_controller/cmake-build-debug

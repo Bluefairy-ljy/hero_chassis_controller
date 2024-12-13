@@ -8,18 +8,20 @@
 #include <tf/tf.h>
 #include <tf/transform_datatypes.h>
 
-namespace tf_transform_helper {
-class TFTransformHelper {
-public:
-  TFTransformHelper();
-  ~TFTransformHelper();
-  bool transformCmdVelToBaseLink(const geometry_msgs::Twist& cmd_vel_odom, geometry_msgs::Twist& cmd_vel_base_link);
+namespace tf_transform_helper
+{
+  class TFTransformHelper
+  {
+  public:
+    TFTransformHelper();
+    ~TFTransformHelper();
+    bool transformCmdVelToBaseLink(const geometry_msgs::Twist& cmd_vel_odom, geometry_msgs::Twist& cmd_vel_base_link);
 
-private:
-  tf::Transformer transformer;
-  tf::TransformBroadcaster broadcaster;
-  tf::TransformListener listener;
-};
+  private:
+    tf::Transformer transformer;
+    tf::TransformBroadcaster broadcaster;
+    tf::TransformListener listener;
+  };
 }
 
 #endif

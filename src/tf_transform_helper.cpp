@@ -7,6 +7,7 @@ TFTransformHelper::TFTransformHelper() {
   broadcaster = tf::TransformBroadcaster();
 }
 
+//析构函数
 TFTransformHelper::~TFTransformHelper() = default;
 
 //transformCmdVelToBaseLink函数

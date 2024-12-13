@@ -6,7 +6,8 @@
 #include <tf/transform_broadcaster.h>
 #include "hero_chassis_controller/kinematics_helper.h"
 
-class odometry_helper {
+class odometry_helper
+{
 public:
   explicit odometry_helper(kinematics_helper::ChassisParams& params);
   ~odometry_helper();
