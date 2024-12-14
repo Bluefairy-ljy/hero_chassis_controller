@@ -1,8 +1,0 @@
-prefix=/home/ljyi/Final_ws/src/hero_chassis_controller/devel
-
-Name: hero_chassis_controller
-Description: Description of hero_chassis_controller
-Version: 0.0.1
-Cflags: -I/home/ljyi/Final_ws/src/hero_chassis_controller/include
-Libs: -L${prefix}/lib -lhero_wheel_controller -lhero_chassis_controller_plugin
-Requires: roscpp std_msgs control_toolbox geometry_msgs nav_msgs tf controller_interface controller_manager hardware_interface pluginlib gazebo_msgs
