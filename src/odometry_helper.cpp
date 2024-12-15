@@ -64,6 +64,7 @@ void odometry_helper::publish_odometry(const geometry_msgs::Twist& chassis_vel) 
   odom.pose.pose.position.x = odom_trans.transform.translation.x;
   odom.pose.pose.position.y = odom_trans.transform.translation.y;
   odom.pose.pose.position.z = 0.0;
+  odom.pose.pose.orientation = odom_trans.transform.rotation;
 
   odom.twist.twist = chassis_vel;
 
