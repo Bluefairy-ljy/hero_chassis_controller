@@ -26,10 +26,10 @@ void inverseKinematics(const geometry_msgs::Twist& cmd_vel, const ChassisParams&
   double W = chassis_params.trackwidth;
   double r = chassis_params.wheel_radius;
 
-  J << 1 / r, -1 / r, -(L + W) / (2 * r),
-      1 / r, 1 / r, (L + W) / (2 * r),
-      1 / r, 1 / r, -(L + W) / (2 * r),
-      1 / r, -1 / r, (L + W) / (2 * r);
+  J << 1 / r, -1 / r, -(L + W) / r,
+      1 / r, 1 / r, (L + W) / r,
+      1 / r, 1 / r, -(L + W) / r,
+      1 / r, -1 / r, (L + W) / r;
 
   ROS_INFO_STREAM("Jacobian matrix: " << std::endl << J);
 
@@ -59,7 +59,7 @@ void forwardKinematics(const std::vector<double>& wheel_speeds, const ChassisPar
   //计算底盘速度分量
   double vx = (wheel_ang_vels[0] + wheel_ang_vels[1] + wheel_ang_vels[2] + wheel_ang_vels[3]) * r / 4;
   double vy = (-wheel_ang_vels[0] + wheel_ang_vels[1] + wheel_ang_vels[2] - wheel_ang_vels[3]) * r / 4;
-  double w = (-wheel_ang_vels[0] + wheel_ang_vels[1] - wheel_ang_vels[2] + wheel_ang_vels[3]) * r / (2 * (L + W));
+  double w = (-wheel_ang_vels[0] + wheel_ang_vels[1] - wheel_ang_vels[2] + wheel_ang_vels[3]) * r / (4 * (L + W));
 
   chassis_vel.linear.x = vx;
   chassis_vel.linear.y = vy;
